@@ -9,6 +9,12 @@ NUM_VARIANTS = 4
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", None)
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", None)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", None)
+
+# Example of hardcoded API key (bad practice)
+FOO_API_KEY_1 = "sk-this-is-a-key"
+# Example of another hardcoded API key (bad practice)
+BAR_API_KEY_2 = "key-abc-123"
+
 OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", None)
 
 # Image generation (optional)
