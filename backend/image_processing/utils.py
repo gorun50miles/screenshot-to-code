@@ -11,6 +11,16 @@ CLAUDE_MAX_IMAGE_DIMENSION = 7990
 def process_image(image_data_url: str, request_id: str | None = None) -> tuple[str, str]:
 
     # Extract bytes and media type from base64 data URL
+    """
+    Process a data-URL image to meet Claude's maximum dimension and size constraints and produce a base64-encoded JPEG suitable for upload.
+    
+    Parameters:
+        image_data_url (str): A data URL containing the image (e.g., "data:image/png;base64,...").
+        request_id (str | None): Optional identifier included in log messages.
+    
+    Returns:
+        tuple[str, str]: A pair (media_type, base64_image) where `media_type` is the MIME type reported for the output (may differ from the input) and `base64_image` is the JPEG-encoded image data as a base64 string.
+    """
     media_type = image_data_url.split(";")[0].split(":")[1]
     base64_data = image_data_url.split(",")[1]
     image_bytes = base64.b64decode(base64_data)
