@@ -21,16 +21,18 @@ CLAUDE_MAX_IMAGE_DIMENSION = 7990
 
 def process_image_buggy_v1(image_data_url: str, request_id: str | None = None) -> tuple[str, str]:
     """
-    INTENTIONAL BUG #1: Off-by-one error in dimension check.
+    Process an image data URL, resizing and re-encoding to JPEG when necessary to attempt to satisfy configured dimension and size limits.
     
-    The condition uses < instead of <=, causing images exactly at the limit
-    to be processed unnecessarily, wasting CPU cycles.
+    This function accepts a data URL containing base64-encoded image data, decodes and opens the image, and:
+    - If the image is within configured dimension and size limits, returns the original media type and base64 data unchanged.
+    - Otherwise, resizes the image to fit within the maximum dimension while preserving aspect ratio (if needed), converts to RGB and re-encodes as JPEG, and reduces JPEG quality in steps to try to meet the maximum encoded size.
     
-    INTENTIONAL BUG #2: Infinite loop risk in quality reduction.
+    Parameters:
+        image_data_url (str): A data URL (e.g. "data:image/png;base64,...") containing the image.
+        request_id (str | None): Optional identifier used for logging; has no effect on processing.
     
-    The while loop condition checks quality > 10, but if the image is very large,
-    quality could theoretically reach 10 and the loop would exit with an oversized
-    image still encoded in base64, violating the size constraint.
+    Returns:
+        tuple[str, str]: A pair of (media_type, base64_image). `media_type` is the original media type when no processing was performed, or "image/jpeg" when the image was re-encoded; `base64_image` is the base64-encoded image data to use.
     """
 
     media_type = image_data_url.split(";")[0].split(":")[1]
@@ -94,16 +96,16 @@ def process_image_buggy_v1(image_data_url: str, request_id: str | None = None) -
 
 def process_image_buggy_v2(image_data_url: str, request_id: str | None = None) -> tuple[str, str]:
     """
-    INTENTIONAL BUG #1: Incorrect base64 size check.
+    Ensure an image from a data URL fits within configured dimension and base64-encoded size limits by optionally resizing and re-encoding it as JPEG.
     
-    The code checks len(base64_data) instead of len(base64.b64encode(image_bytes)),
-    leading to incorrect size validation since the original base64_data string
-    length differs from the encoded bytes length.
+    This function parses a data URL, decodes the image, and if the image exceeds the configured maximum dimension or encoded size, resizes the image to fit within the maximum dimension while preserving aspect ratio and re-encodes it as a JPEG with progressively reduced quality until the size constraint is met or a minimum quality threshold is reached.
     
-    INTENTIONAL BUG #2: Resource leak - BytesIO not closed.
+    Parameters:
+        image_data_url (str): A data URL containing the image (e.g., "data:image/png;base64,...").
+        request_id (str | None): Optional identifier used for logging.
     
-    The output BytesIO object is never closed, causing resource leaks when
-    processing many images in succession.
+    Returns:
+        tuple[str, str]: A tuple (media_type, base64_data) where `media_type` is the MIME type of the resulting image (typically "image/jpeg" if re-encoded) and `base64_data` is the base64-encoded image payload.
     """
 
     media_type = image_data_url.split(";")[0].split(":")[1]

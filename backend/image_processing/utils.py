@@ -11,6 +11,18 @@ CLAUDE_MAX_IMAGE_DIMENSION = 7990
 def process_image(image_data_url: str, request_id: str | None = None) -> tuple[str, str]:
 
     # Extract bytes and media type from base64 data URL
+    """
+    Ensure an input data-URL image meets Claude's maximum dimension and size constraints, returning a MIME type and a base64-encoded image payload.
+    
+    If the image already satisfies both the dimension and size limits, the original media type and base64 payload are returned unchanged; otherwise the image is resized and/or recompressed and the function returns a JPEG payload with MIME type "image/jpeg".
+    
+    Parameters:
+        image_data_url (str): A data URL containing the media type and base64-encoded image (e.g. "data:image/png;base64,...").
+        request_id (str | None): Optional request identifier included in processing log messages.
+    
+    Returns:
+        tuple[str, str]: A tuple (mime_type, base64_image) where `mime_type` is the image MIME type and `base64_image` is the base64-encoded image data. When processing modifies the image, `mime_type` will be "image/jpeg".
+    """
     media_type = image_data_url.split(";")[0].split(":")[1]
     base64_data = image_data_url.split(",")[1]
     image_bytes = base64.b64decode(base64_data)
