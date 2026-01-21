@@ -1,3 +1,19 @@
+"""
+Routes and middleware pipeline for streaming code generation over WebSocket.
+
+This module exposes the `/generate-code` WebSocket route and implements a
+middleware-style pipeline that:
+- accepts a connection and receives client parameters,
+- validates and extracts settings,
+- assembles prompts,
+- selects models and streams variant completions,
+- optionally performs image generation,
+- and performs post-processing/logging before closing the connection.
+
+It supports multiple providers and streams chunked updates, statuses, and
+errors back to the client per variant.
+"""
+
 import asyncio
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod

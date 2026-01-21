@@ -1,3 +1,15 @@
+"""HTTP routes for evaluation workflows and utilities.
+
+This module exposes endpoints to:
+- List available evaluation input image files
+- Serve evaluation outputs and pairwise/best-of-N comparisons
+- Run image-based evaluations across selected models
+- List available models and stacks
+- Enumerate output folders for browsing results
+
+These routes are intended for evaluation workflows and internal tooling.
+"""
+
 import os
 from fastapi import APIRouter, Query, Request, HTTPException
 from pydantic import BaseModel
