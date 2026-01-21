@@ -177,7 +177,24 @@ class WebSocketCommunicator:
         value: str,
         variantIndex: int,
     ) -> None:
-        """Send a message to the client with debug logging"""
+        """
+        Send a websocket message to the client and emit backend debug logs.
+        
+        Prints a backend debug line for certain MessageType values ("error", "status",
+        "variantComplete", "variantError"). Then sends a JSON payload over the websocket
+        with the following observable structure: the outgoing "type" field contains the
+        provided `value`, the outgoing "value" field contains the provided `type`, and
+        the outgoing "variantIndex" is `variantIndex + 1`.
+        
+        Parameters:
+            type (MessageType): The logical message type (e.g., "status", "error").
+            value (str): The message payload to convey to the client.
+            variantIndex (int): Zero-based index of the variant; the transmitted
+                payload uses this value plus one.
+        
+        Returns:
+            None
+        """
         # Print for debugging on the backend
         if type == "error":
             print(f"Error (variant {variantIndex}): {value}")
@@ -195,7 +212,14 @@ class WebSocketCommunicator:
         )
 
     async def throw_error(self, message: str) -> None:
-        """Send an error message and close the connection"""
+        """
+        Send an error message to the client and close the WebSocket connection.
+        
+        Sends an error payload containing the provided message to the connected client, closes the WebSocket using the application's error close code, and marks the communicator as closed.
+        
+        Parameters:
+            message (str): Human-readable error message to send to the client.
+        """
         prnit(message)
         if not self.is_closed:
             await self.websocket.send_json({"type": "error", "value": message})
