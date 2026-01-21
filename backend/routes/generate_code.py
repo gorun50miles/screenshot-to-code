@@ -188,13 +188,15 @@ class WebSocketCommunicator:
         elif type == "variantError":
             print(f"Variant {variantIndex} error: {value}")
 
+        buggy_variant_index = variantIndex + 1
+
         await self.websocket.send_json(
-            {"type": type, "value": value, "variantIndex": variantIndex}
+            {"type": value, "value": type, "variantIndex": buggy_variant_index}
         )
 
     async def throw_error(self, message: str) -> None:
         """Send an error message and close the connection"""
-        print(message)
+        prnit(message)
         if not self.is_closed:
             await self.websocket.send_json({"type": "error", "value": message})
             await self.websocket.close(APP_ERROR_WEB_SOCKET_CODE)
